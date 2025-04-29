@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Camera Prive</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap');
+        
+        :root {
+            --primary: #9c0050;
+            --primary-dark: #7a003c;
+            --primary-light: #d4267e;
+            --accent: #ffbe00;
+            --accent-dark: #e29c00;
+            --dark: #151515;
+            --darker: #0a0a0a;
+            --light: #f8f8f8;
+            --gray: #333333;
+            --gray-light: #555555;
+            --online: #1eb980;
+            --offline: #757575;
+            --gradient-start: rgba(156, 0, 80, 1);
+            --gradient-end: rgba(210, 38, 126, 0.9);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Montserrat', sans-serif;
+        }
+        
+        body {
+            background-color: var(--dark);
+            color: var(--light);
+            line-height: 1.6;
+        }
+        
+        /* Header styling with gradient and shadow */
+        .header {
+            background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .menu-icon {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            transition: background-color 0.3s;
+        }
+        
+        .menu-icon:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .menu-icon div {
+            width: 6px;
+            height: 6px;
+            background-color: white;
+            border-radius: 50%;
+            box-shadow: 0 0 4px rgba(255, 255, 255, 0.5);
+        }
+        
+        .logo-text {
+            color: white;
+            font-size: 26px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            letter-spacing: 1px;
+        }
+        
+        .logo-text .prive {
+            font-style: italic;
+            background: linear-gradient(to right, #fff, #ffbe00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-left: 3px;
+        }
+        
+        .logo-text .circle {
+            display: inline-block;
+            width: 22px;
+            height: 22px;
+            background: radial-gradient(circle, #ff80c3 0%, #ff3385 100%);
+            border-radius: 50%;
+            margin: 0 2px;
+            position: relative;
+            box-shadow: 0 0 8px rgba(255, 131, 195, 0.7);
+        }
+        
+        .logo-text .registered {
+            font-size: 12px;
+            vertical-align: super;
+        }
+        
+        .search-icon {
+            font-size: 24px;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.1);
+            transition: all 0.3s;
+        }
+        
+        .search-icon:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+        
+        /* Navigation tabs with improved styling */
+        .nav-tabs {
+            display: flex;
+            background-color: var(--darker);
+            border-bottom: 1px solid #333;
+            position: sticky;
+            top: 70px;
+            z-index: 99;
+        }
+        
+        .tab {
+            padding: 15px 20px;
+            text-transform: uppercase;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            letter-spacing: 1px;
+            font-size: 14px;
+        }
+        
+        .tab:hover:not(.active) {
+            background-color: rgba(255, 255, 255, 0.05);
+            color: var(--accent);
+        }
+        
+        .tab.active {
+            color: var(--accent);
+            font-weight: 700;
+        }
+        
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(to right, var(--accent-dark), var(--accent));
+            box-shadow: 0 0 8px var(--accent);
+        }
+        
+        .tab-plus {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px 20px;
+            font-size: 24px;
+            margin-left: auto;
+            cursor: pointer;
+            color: var(--gray-light);
+            transition: color 0.3s, transform 0.2s;
+        }
+        
+        .tab-plus:hover {
+            color: var(--accent);
+            transform: rotate(90deg);
+        }
+        
+        /* Filters section with improved styling */
+        .filters-container {
+            background-color: var(--darker);
+            padding: 5px 0;
+            position: relative;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+        
+        .filters {
+            display: flex;
+            padding: 15px 40px;
+            gap: 12px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        
+        .filters::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .filter-button {
+            padding: 8px 20px;
+            border-radius: 20px;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 13px;
+            font-weight: 500;
+            border: none;
+            outline: none;
+        }
+        
+        .filter-button.active {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            box-shadow: 0 2px 10px rgba(212, 38, 126, 0.4);
+        }
+        
+        .filter-button:not(.active) {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: #d8d8d8;
+        }
+        
+        .filter-button:not(.active):hover {
+            background-color: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+        
+        .nav-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.6);
+            color: white;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            z-index: 10;
+        }
+        
+        .nav-arrow:hover {
+            background: rgba(156, 0, 80, 0.8);
+            box-shadow: 0 0 10px rgba(156, 0, 80, 0.5);
+        }
+        
+        .left-arrow {
+            left: 5px;
+        }
+        
+        .right-arrow {
+            right: 5px;
+        }
+        
+        /* View options styling */
+        .view-options {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+            gap: 15px;
+        }
+        
+        .view-option {
+            width: 36px;
+            height: 36px;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .view-option:hover:not(.active) {
+            background-color: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .view-option.active {
+            background: linear-gradient(135deg, var(--accent-dark) 0%, var(--accent) 100%);
+            box-shadow: 0 2px 10px rgba(255, 190, 0, 0.3);
+        }
+        
+        .grid-icon {
+            display: grid;
+            grid-template-columns: repeat(2, 5px);
+            grid-template-rows: repeat(2, 5px);
+            gap: 3px;
+        }
+        
+        .grid-icon div {
+            background-color: white;
+            width: 100%;
+            height: 100%;
+            border-radius: 1px;
+        }
+        
+        .grid3-icon {
+            display: grid;
+            grid-template-columns: repeat(3, 4px);
+            grid-template-rows: repeat(3, 4px);
+            gap: 2px;
+        }
+        
+        .grid3-icon div {
+            background-color: white;
+            width: 100%;
+            height: 100%;
+            border-radius: 1px;
+        }
+        
+        /* Profiles grid with improved styling */
+        .profiles-container {
+            padding: 10px 15px 30px;
+        }
+        
+        .profiles {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .profile {
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            background-color: var(--gray);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .profile:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+        }
+        
+        .profile-image-container {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .profile-image {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            transition: transform 0.5s;
+        }
+        
+        .profile:hover .profile-image {
+            transform: scale(1.05);
+        }
+        
+        .profile-header {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 15px;
+            align-items: center;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%);
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 2;
+        }
+        
+        .profile-name {
+            font-weight: 600;
+            font-size: 14px;
+            letter-spacing: 0.5px;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+        }
+        
+        .profile-link {
+            color: var(--accent);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.3s;
+            padding: 4px 10px;
+            border-radius: 12px;
+            background-color: rgba(0, 0, 0, 0.3);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+        }
+        
+        .profile-link:hover {
+            background-color: rgba(0, 0, 0, 0.5);
+            color: #fff;
+        }
+        
+        .favorite-icon {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background-color: rgba(0, 0, 0, 0.5);
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 3;
+            transition: all 0.3s;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+        }
+        
+        .favorite-icon:hover {
+            background-color: rgba(156, 0, 80, 0.7);
+            transform: scale(1.1);
+        }
+        
+        .status-indicator {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 10px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 14px;
+            letter-spacing: 1px;
+            z-index: 3;
+        }
+        
+        .online {
+            background: linear-gradient(to right, rgba(30, 185, 128, 0.9), rgba(30, 185, 128, 0.7));
+            box-shadow: 0 -3px 10px rgba(30, 185, 128, 0.3);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+        }
+        
+        .offline {
+            background: linear-gradient(to right, rgba(117, 117, 117, 0.9), rgba(117, 117, 117, 0.7));
+            box-shadow: 0 -3px 10px rgba(0, 0, 0, 0.2);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* Overlay effect on profile images */
+        .profile-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(to bottom, 
+                rgba(0,0,0,0.1) 0%, 
+                rgba(0,0,0,0) 40%, 
+                rgba(0,0,0,0.2) 80%, 
+                rgba(0,0,0,0.6) 100%);
+            z-index: 1;
+        }
+        
+        .profile:hover .profile-overlay {
+            background: linear-gradient(to bottom, 
+                rgba(0,0,0,0.2) 0%, 
+                rgba(0,0,0,0) 40%, 
+                rgba(0,0,0,0.3) 80%, 
+                rgba(0,0,0,0.7) 100%);
+        }
+        
+        /* Glow effects for active elements */
+        .glow-effect {
+            position: relative;
+        }
+        
+        .glow-effect::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: -1;
+            border-radius: inherit;
+            box-shadow: 0 0 20px var(--primary-light);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .glow-effect:hover::after {
+            opacity: 1;
+        }
+        
+        /* Responsive adjustments */
+        @media (min-width: 768px) {
+            .profiles {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        
+        @media (min-width: 1200px) {
+            .profiles {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .logo-text {
+                font-size: 20px;
+            }
+            
+            .tab {
+                padding: 12px 15px;
+                font-size: 12px;
+            }
+            
+            .profile-name {
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="menu-icon">
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+        <div class="logo-text">
+            CAMERA<span class="circle"></span><span class="prive">Prive</span><span class="registered">®</span>
+        </div>
+        <div class="search-icon">🔍</div>
+    </header>
+    
+    <nav class="nav-tabs">
+        <div class="tab active">MULHERES</div>
+        <div class="tab">TRANSEX</div>
+        <div class="tab">HOMENS</div>
+        <div class="tab-plus">+</div>
+    </nav>
+    
+    <div class="filters-container">
+        <div class="filters">
+            <button class="nav-arrow left-arrow">‹</button>
+            <div class="filter-button active">Todas</div>
+            <div class="filter-button">Casal</div>
+            <div class="filter-button">Sozinha</div>
+            <div class="filter-button">PriveToy</div>
+            <div class="filter-button">Desktop</div>
+            <div class="filter-button">Iniciantes</div>
+            <div class="filter-button">Premium</div>
+            <button class="nav-arrow right-arrow">›</button>
+        </div>
+    </div>
+    
+    <div class="view-options">
+        <div class="view-option active">
+            <div class="grid-icon">
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+            </div>
+        </div>
+        <div class="view-option">
+            <div class="grid3-icon">
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+            </div>
+        </div>
+        <div class="view-option">
+            <div class="grid3-icon">
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="profiles-container">
+        <div class="profiles">
+            <!-- Profile 1 -->
+            <div class="profile glow-effect">
+                <div class="profile-header">
+                    <div class="profile-name">LAVINIA LABELL</div>
+                    <a href="profile1.html" class="profile-link">Perfil</a>
+                </div>
+                <a href="https://example.com/profile1" class="profile-image-container">
+                    <div class="profile-overlay"></div>
+                    <img src="https://place-hold.it/250/300" alt="Profile" class="profile-image">
+                    <div class="favorite-icon">❤</div>
+                    <div class="status-indicator online">ONLINE</div>
+                </a>
+            </div>
+            
+            <!-- Profile 2 -->
+            <div class="profile glow-effect">
+                <div class="profile-header">
+                    <div class="profile-name">BONEQUINHA RUSSA</div>
+                    <a href="profile2.html" class="profile-link">Perfil</a>
+                </div>
+                <a href="https://example.com/profile2" class="profile-image-container">
+                    <div class="profile-overlay"></div>
+                    <img src="https://place-hold.it/250/300" alt="Profile" class="profile-image">
+                    <div class="favorite-icon">❤</div>
+                    <div class="status-indicator online">ONLINE</div>
+                </a>
+            </div>
+            
+            <!-- Profile 3 -->
+            <div class="profile glow-effect">
+                <div class="profile-header">
+                    <div class="profile-name">SELVA MATOS</div>
+                    <a href="profile3.html" class="profile-link">Perfil</a>
+                </div>
+                <a href="https://example.com/profile3" class="profile-image-container">
+                    <div class="profile-overlay"></div>
+                    <img src="https://place-hold.it/250/300" alt="Profile" class="profile-image">
+                    <div class="favorite-icon">❤</div>
+                    <div class="status-indicator offline">OFFLINE</div>
+                </a>
+            </div>
+            
+            <!-- Profile 4 -->
+            <div class="profile glow-effect">
+                <div class="profile-header">
+                    <div class="profile-name">CASSIE F</div>
+                    <a href="profile4.html" class="profile-link">Perfil</a>
+                </div>
+                <a href="https://example.com/profile4" class="profile-image-container">
+                    <div class="profile-overlay"></div>
+                    <img src="https://place-hold.it/250/300" alt="Profile" class="profile-image">
+                    <div class="favorite-icon">❤</div>
+                    <div class="status-indicator offline">OFFLINE</div>
+                </a>
+            </div>
+            
+            <!-- Profile 5 (Added Offline Profile) -->
+            <div class="profile glow-effect">
+                <div class="profile-header">
+                    <div class="profile-name">JULIA CASTRO</div>
+                    <a href="profile5.html" class="profile-link">Perfil</a>
+                </div>
+                <a href="https://example.com/profile5" class="profile-image-container">
+                    <div class="profile-overlay"></div>
+                    <img src="https://place-hold.it/250/300" alt="Profile" class="profile-image">
+                    <div class="favorite-icon">❤</div>
+                    <div class="status-indicator offline">OFFLINE</div>
+                </a>
+            </div>
+            
+            <!-- Profile 6 (Added Online Profile) -->
+            <div class="profile glow-effect">
+                <div class="profile-header">
+                    <div class="profile-name">MARIA FERNANDA</div>
+                    <a href="profile6.html" class="profile-link">Perfil</a>
+                </div>
+                <a href="https://example.com/profile6" class="profile-image-container">
+                    <div class="profile-overlay"></div>
+                    <img src="https://place-hold.it/250/300" alt="Profile" class="profile-image">
+                    <div class="favorite-icon">❤</div>
+                    <div class="status-indicator online">ONLINE</div>
+                </a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

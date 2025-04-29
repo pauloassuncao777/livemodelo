@@ -1,0 +1,114 @@
+id: 34.90, Nome: 
+Random ID: 35855, Data Futura: 2025-04-09, id: 34.9
+CPF: 38323804850, Formatted CPF: 383.238.048-50, Name: Thais
+id: 34.90, Nome: 
+Random ID: 92320, Data Futura: 2025-04-11, id: 34.9
+CPF: 38323804850, Formatted CPF: 383.238.048-50, Name: Thais
+id: 34.9, Nome: 
+Random ID: 57723, Data Futura: 2025-04-12, id: 34.9
+CPF: 38323804850, Formatted CPF: 383.238.048-50, Name: Thais
+id: 34.9, Nome: 
+Random ID: 43012, Data Futura: 2025-04-12, id: 34.9
+CPF: 38323804850, Formatted CPF: 383.238.048-50, Name: Thais
+id: 34.9, Nome: 
+Random ID: 76107, Data Futura: 2025-04-12, id: 34.9
+CPF: 38323804850, Formatted CPF: 383.238.048-50, Name: Thais
+id: 34.9, Nome: 
+Random ID: 46364, Data Futura: 2025-04-12, id: 34.9
+CPF: 38323804850, Formatted CPF: 383.238.048-50, Name: Thais
+id: 34.9, Nome: 
+Random ID: 42073, Data Futura: 2025-04-12, id: 34.9
+CPF: 38323804850, Formatted CPF: 383.238.048-50, Name: Thais
+Response Data: Array
+(
+    [transactionId] => ad3dd1b3b4988599ad77m9c1854l4wuf
+    [external_id] => 42073
+    [status] => PENDING
+    [amount] => 34.9
+    [calendar] => Array
+        (
+            [expiration] => 3000
+            [dueDate] => 2025-04-10 09:11:48
+        )
+
+    [debtor] => Array
+        (
+            [name] => Thais
+            [document] => 383.238.048-50
+        )
+
+    [qrcode] => 00020126870014br.gov.bcb.pix2565pix.primepag.com.br/qr/v3/at/39381882-5501-4e4b-8ce6-4d8d6616affa5204000053039865802BR5925PIXUP SERVICOS E INTERMED6008SALVADOR62070503***6304FC6A
+)
+
+id: 34.9, Nome: 
+Random ID: 25265, Data Futura: 2025-04-12, id: 34.9
+CPF: 38323804850, Formatted CPF: 383.238.048-50, Name: Thais
+Response Data: Array
+(
+    [transactionId] => a9fc5fe15a2515fc1c81m9c18nxv13ij
+    [external_id] => 25265
+    [status] => PENDING
+    [amount] => 34.9
+    [calendar] => Array
+        (
+            [expiration] => 3000
+            [dueDate] => 2025-04-10 09:12:12
+        )
+
+    [debtor] => Array
+        (
+            [name] => Thais
+            [document] => 383.238.048-50
+        )
+
+    [qrcode] => 00020126870014br.gov.bcb.pix2565pix.primepag.com.br/qr/v3/at/dacc1595-478f-49ea-9712-6a18e27f2cbd5204000053039865802BR5925PIXUP SERVICOS E INTERMED6008SALVADOR62070503***6304A618
+)
+
+id: 34.9, Nome: 
+Random ID: 53973, Data Futura: 2025-04-12, id: 34.9
+CPF: 38323804850, Formatted CPF: 383.238.048-50, Name: Thais
+Response Data: Array
+(
+    [transactionId] => 10ed790d80764be4c66cm9c1dzl24xvn
+    [external_id] => 53973
+    [status] => PENDING
+    [amount] => 34.9
+    [calendar] => Array
+        (
+            [expiration] => 3000
+            [dueDate] => 2025-04-10 09:16:20
+        )
+
+    [debtor] => Array
+        (
+            [name] => Thais
+            [document] => 383.238.048-50
+        )
+
+    [qrcode] => 00020126870014br.gov.bcb.pix2565pix.primepag.com.br/qr/v3/at/31f3954f-d189-428d-bac6-05ec7656adfb5204000053039865802BR5925PIXUP SERVICOS E INTERMED6008SALVADOR62070503***63049B8A
+)
+
+id: 34.9, Nome: 
+Random ID: 31344, Data Futura: 2025-04-12, id: 34.9
+CPF: 38323804850, Formatted CPF: 383.238.048-50, Name: Thais
+Response Data: Array
+(
+    [transactionId] => ab82afb56da85555136fm9c1grgosjae
+    [external_id] => 31344
+    [status] => PENDING
+    [amount] => 34.9
+    [calendar] => Array
+        (
+            [expiration] => 3000
+            [dueDate] => 2025-04-10 09:18:30
+        )
+
+    [debtor] => Array
+        (
+            [name] => Thais
+            [document] => 383.238.048-50
+        )
+
+    [qrcode] => 00020126870014br.gov.bcb.pix2565pix.primepag.com.br/qr/v3/at/dc6e42c9-9567-43c2-8487-c58e485339d95204000053039865802BR5925PIXUP SERVICOS E INTERMED6008SALVADOR62070503***63045ECF
+)
+
