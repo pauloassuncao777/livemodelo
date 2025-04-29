@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dating App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .map-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            background-color: #e8f5e9;
+            overflow: hidden;
+        }
+
+        /* Map styling */
+        .road {
+            position: absolute;
+            background-color: #ff9800;
+            opacity: 0.5;
+        }
+
+        .road-horizontal {
+            height: 5px;
+            width: 100%;
+        }
+
+        .road-vertical {
+            width: 5px;
+            height: 100%;
+        }
+
+        .road-label {
+            position: absolute;
+            background-color: #ffe0b2;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            z-index: 5;
+        }
+
+        /* Map controls */
+        .map-controls {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background-color: white;
+            border-radius: 4px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            z-index: 10;
+        }
+
+        .map-controls button {
+            display: block;
+            width: 36px;
+            height: 36px;
+            font-size: 20px;
+            border: none;
+            background: white;
+        }
+
+        .map-controls button:first-child {
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        /* Profile markers */
+        .profile-marker {
+            position: absolute;
+            z-index: 5;
+        }
+
+        .profile-marker-inner {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: white;
+            border: 2px solid white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .profile-marker-inner img {
+            width: 90%;
+            height: 90%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .profile-marker-pointer {
+            position: absolute;
+            bottom: -6px;
+            left: 50%;
+            transform: translateX(-50%) rotate(45deg);
+            width: 12px;
+            height: 12px;
+            background-color: white;
+        }
+
+        /* Bottom card */
+        .bottom-card {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-top-left-radius: 24px;
+            border-top-right-radius: 24px;
+            padding: 24px;
+            z-index: 20;
+        }
+
+        .location-indicator {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+        }
+
+        .location-dot {
+            width: 24px;
+            height: 24px;
+            background-color: #4CAF50;
+            border-radius: 50%;
+            margin-right: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .location-dot::after {
+            content: "";
+            width: 12px;
+            height: 12px;
+            background-color: white;
+            border-radius: 50%;
+        }
+
+        .location-text {
+            font-size: 18px;
+            font-weight: 500;
+        }
+
+        .main-headline {
+            font-size: 28px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+        }
+
+        .man-button {
+            background-color: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 16px;
+            width: 100%;
+            max-width: 300px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            cursor: pointer;
+        }
+
+        .button-emoji {
+            font-size: 24px;
+            margin-bottom: 4px;
+        }
+
+        .button-text {
+            font-size: 20px;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="map-container" id="map-container">
+        <!-- Map controls -->
+        <div class="map-controls">
+            <button>+</button>
+            <button>−</button>
+        </div>
+
+        <!-- Road labels -->
+        <div class="road-label" style="top:15%; left:25%;">PR-092</div>
+        <div class="road-label" style="top:15%; right:25%;">PR-417</div>
+        <div class="road-label" style="top:33%; left:16%;">PR-418</div>
+        <div class="road-label" style="bottom:33%; left:20%;">BR-277</div>
+        <div class="road-label" style="bottom:25%; left:45%;">BR-476</div>
+        <div class="road-label" style="bottom:25%; left:50%;">BR-116</div>
+
+        <!-- Profile markers will be added by JavaScript -->
+    </div>
+
+    <!-- Bottom card -->
+    <div class="bottom-card">
+        <div class="location-indicator">
+            <div class="location-dot"></div>
+            <span class="location-text" id="location-text">Carregando...</span>
+        </div>
+        <h1 class="main-headline">É hora de dar o "match" na sua história de amor!</h1>
+        <div class="button-container">
+            <button class="man-button" id="man-button">
+                <span class="button-emoji">👨</span>
+                <span class="button-text">Eu sou um homem</span>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Function to simulate GeoIP and update location
+        function simulateGeoIP() {
+            setTimeout(() => {
+                document.getElementById('location-text').textContent = 'Curitiba, Brasil';
+            }, 1000);
+        }
+
+        // Function to create profile markers
+        function createProfileMarkers() {
+            const mapContainer = document.getElementById('map-container');
+            const positions = [
+                { top: '40%', left: '30%' },
+                { top: '35%', left: '37%' },
+                { top: '45%', left: '32%' },
+                { top: '42%', left: '40%' },
+                { top: '50%', left: '35%' },
+                { top: '30%', left: '45%' },
+                { top: '25%', left: '82%' },
+                { top: '65%', left: '10%' }
+            ];
+
+            positions.forEach((pos, index) => {
+                const marker = document.createElement('div');
+                marker.className = 'profile-marker';
+                marker.style.top = pos.top;
+                marker.style.left = pos.left;
+
+                const inner = document.createElement('div');
+                inner.className = 'profile-marker-inner';
+
+                const img = document.createElement('img');
+                img.src = `/api/placeholder/40/40`;
+                img.alt = 'Profile';
+
+                const pointer = document.createElement('div');
+                pointer.className = 'profile-marker-pointer';
+
+                inner.appendChild(img);
+                marker.appendChild(inner);
+                marker.appendChild(pointer);
+                mapContainer.appendChild(marker);
+            });
+        }
+
+        // Handle button click
+        document.getElementById('man-button').addEventListener('click', function() {
+            window.open('https://www.google.com', '_blank');
+        });
+
+        // Initialize when page loads
+        window.onload = function() {
+            simulateGeoIP();
+            createProfileMarkers();
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mapa Match</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <style>
+        html, body, #map {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        .overlay {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            font-family: Arial, sans-serif;
+            width: 90%;
+            max-width: 400px;
+        }
+
+        button {
+            padding: 12px;
+            font-size: 16px;
+            border: none;
+            border-radius: 10px;
+            background-color: #fff;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #f0f0f0;
+        }
+
+        .emoji {
+            font-size: 20px;
+        }
+    </style>
+</head>
+<body>
+<div id="map"></div>
+<div class="overlay">
+    <p id="cidade">Carregando localização...</p>
+    <button onclick="window.location.href='https://google.com'">
+        Eu sou um homem <span class="emoji">👨🏻</span>
+    </button>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+    async function getGeoIP() {
+        const response = await fetch('https://ipapi.co/json/');
+        return await response.json();
+    }
+
+    async function initMap() {
+        const geoData = await getGeoIP();
+        const cidade = geoData.city + ', ' + geoData.region;
+        document.getElementById('cidade').textContent = `📍 ${cidade}`;
+
+        const map = L.map('map').setView([geoData.latitude, geoData.longitude], 13);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap'
+        }).addTo(map);
+
+        const pessoas = [
+            {lat: geoData.latitude + 0.01, lng: geoData.longitude - 0.01, foto: 'https://i.pravatar.cc/50?img=1'},
+            {lat: geoData.latitude - 0.01, lng: geoData.longitude + 0.01, foto: 'https://i.pravatar.cc/50?img=2'},
+            {lat: geoData.latitude + 0.015, lng: geoData.longitude + 0.02, foto: 'https://i.pravatar.cc/50?img=3'},
+            {lat: geoData.latitude - 0.015, lng: geoData.longitude - 0.02, foto: 'https://i.pravatar.cc/50?img=4'},
+            {lat: geoData.latitude + 0.02, lng: geoData.longitude, foto: 'https://i.pravatar.cc/50?img=5'}
+        ];
+
+        pessoas.forEach(pessoa => {
+            L.marker([pessoa.lat, pessoa.lng], {
+                icon: L.divIcon({
+                    html: `<img src="${pessoa.foto}" style="border-radius: 50%; width: 40px; height: 40px; border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">`,
+                    className: ''
+                })
+            }).addTo(map);
+        });
+    }
+
+    initMap();
+</script>
+</body>
+</html>

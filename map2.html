@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dating App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+            background-color: #121212;
+            color: #f8f8f8;
+        }
+
+        .map-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+            /* Slight darkness overlay over the map for better theme integration */
+            box-shadow: inset 0 0 150px 0px rgba(0, 0, 0, 0.7);
+        }
+
+        .map {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            touch-action: none;
+            background-color: #1e272e;
+            filter: brightness(0.85) saturate(0.8); /* Darken the map a bit */
+        }
+
+        /* Map controls */
+        .map-controls {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background-color: rgba(35, 35, 35, 0.85);
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4), 0 0 15px rgba(255, 255, 255, 0.05);
+            z-index: 10;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .map-controls button {
+            display: block;
+            width: 40px;
+            height: 40px;
+            font-size: 24px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-weight: bold;
+            color: #f8f8f8;
+            transition: background-color 0.2s ease;
+        }
+
+        .map-controls button:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .map-controls button:first-child {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px 8px 0 0;
+        }
+
+        .map-controls button:last-child {
+            border-radius: 0 0 8px 8px;
+        }
+
+        /* Road labels */
+        .road-label {
+            position: absolute;
+            background-color: rgba(35, 35, 35, 0.75);
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            z-index: 5;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            color: #f8f8f8;
+            pointer-events: none;
+            backdrop-filter: blur(3px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Profile markers */
+        .profile-marker {
+            position: absolute;
+            z-index: 5;
+            transform: translate(-50%, -100%);
+            pointer-events: auto;
+            cursor: pointer;
+        }
+
+        .profile-marker-inner {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background-color: #1e1e1e;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5), 0 0 20px rgba(255, 120, 180, 0.2);
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .profile-marker-inner:hover {
+            transform: scale(1.1);
+            border-color: rgba(255, 120, 180, 0.8);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5), 0 0 30px rgba(255, 120, 180, 0.4);
+        }
+
+        .profile-marker-inner img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            filter: brightness(1.1) contrast(1.1);
+        }
+
+        .profile-marker-pointer {
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%) rotate(45deg);
+            width: 16px;
+            height: 16px;
+            background-color: #1e1e1e;
+            box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.3);
+            border-right: 2px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Profile status labels */
+        .profile-status {
+            position: absolute;
+            top: -22px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #ff2e63, #ff0844);
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: bold;
+            color: white;
+            white-space: nowrap;
+            box-shadow: 0 2px 8px rgba(255, 40, 90, 0.6);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .profile-status.live {
+            background: linear-gradient(135deg, #ff2e63, #ff0844);
+            box-shadow: 0 2px 8px rgba(255, 40, 90, 0.6), 0 0 15px rgba(255, 40, 90, 0.4);
+            animation: pulseLive 1.5s infinite;
+        }
+
+        .profile-status.recent {
+            background: linear-gradient(135deg, #3d72b4, #1e3c72);
+            font-size: 9px;
+            box-shadow: 0 2px 8px rgba(30, 60, 114, 0.5);
+        }
+
+        @keyframes pulseLive {
+            0% {
+                box-shadow: 0 2px 8px rgba(255, 40, 90, 0.6), 0 0 5px rgba(255, 40, 90, 0.4);
+            }
+            50% {
+                box-shadow: 0 2px 8px rgba(255, 40, 90, 0.6), 0 0 20px rgba(255, 40, 90, 0.7);
+            }
+            100% {
+                box-shadow: 0 2px 8px rgba(255, 40, 90, 0.6), 0 0 5px rgba(255, 40, 90, 0.4);
+            }
+        }
+
+        /* Bottom card */
+        .bottom-card {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to bottom, rgba(30, 30, 30, 0.85), rgba(20, 20, 20, 0.95));
+            border-top-left-radius: 24px;
+            border-top-right-radius: 24px;
+            padding: 28px 24px;
+            z-index: 20;
+            box-shadow: 0 -10px 25px rgba(0, 0, 0, 0.5);
+            pointer-events: auto;
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .location-indicator {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 18px;
+        }
+
+        .location-dot {
+            width: 28px;
+            height: 28px;
+            background: linear-gradient(135deg, #36d1dc, #5b86e5);
+            border-radius: 50%;
+            margin-right: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 12px rgba(91, 134, 229, 0.4), 0 0 15px rgba(54, 209, 220, 0.3);
+            position: relative;
+        }
+
+        .location-dot::after {
+            content: "";
+            width: 14px;
+            height: 14px;
+            background-color: white;
+            border-radius: 50%;
+            box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .location-dot::before {
+            content: "";
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background: transparent;
+            border-radius: 50%;
+            border: 2px solid rgba(91, 134, 229, 0.3);
+            animation: ripple 1.5s infinite ease-out;
+        }
+
+        @keyframes ripple {
+            0% {
+                transform: scale(0.8);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1.5);
+                opacity: 0;
+            }
+        }
+
+        .location-text {
+            font-size: 18px;
+            font-weight: 500;
+            color: #f8f8f8;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        .main-headline {
+            font-size: 28px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 28px;
+            color: #f8f8f8;
+            line-height: 1.3;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(to right, #ff8a00, #ff2e63);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            padding: 5px 0;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            padding: 10px;
+        }
+
+        .man-button {
+            background: linear-gradient(135deg, #2c3e50, #4a4a4a);
+            border: none;
+            border-radius: 16px;
+            padding: 20px;
+            width: 100%;
+            max-width: 300px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3), 0 0 15px rgba(255, 255, 255, 0.05);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .man-button::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: 0.5s;
+        }
+
+        .man-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4), 0 0 30px rgba(255, 255, 255, 0.1);
+            background: linear-gradient(135deg, #3a4b5f, #5a5a5a);
+        }
+
+        .man-button:hover::after {
+            left: 100%;
+        }
+
+        .button-emoji {
+            font-size: 32px;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        .button-text {
+            font-size: 20px;
+            font-weight: 500;
+            color: #f8f8f8;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Map tile elements */
+        .map-tile {
+            position: absolute;
+            width: 256px;
+            height: 256px;
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+    </style>
+</head>
+<body>
+    <div class="map-container">
+        <!-- Interactive map div -->
+        <div id="map" class="map"></div>
+
+        <!-- Map controls -->
+        <div class="map-controls">
+            <button id="zoom-in">+</button>
+            <button id="zoom-out">−</button>
+        </div>
+
+        <!-- Road labels - will be positioned dynamically -->
+        <div id="road-labels"></div>
+
+        <!-- Profile markers container - will be populated dynamically -->
+        <div id="profile-markers"></div>
+    </div>
+
+    <!-- Bottom card -->
+    <div class="bottom-card">
+        <div class="location-indicator">
+            <div class="location-dot"></div>
+            <span class="location-text" id="location-text">Carregando...</span>
+        </div>
+        <h1 class="main-headline" id="main-headline">É hora de dar o "match" na sua história de amor!</h1>
+        <div class="button-container">
+            <button class="man-button" id="man-button">
+                <span class="button-emoji">👨</span>
+                <span class="button-text">Eu sou um homem</span>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Map variables
+        let map = document.getElementById('map');
+        let isDragging = false;
+        let startX, startY, startLeft, startTop;
+        let zoom = 15; // Starting zoom level
+        let mapLeft = 0;
+        let mapTop = 0;
+        let tileSize = 256;
+        
+        // Starting center location (Curitiba, Brasil)
+        let centerLat = -25.4284;
+        let centerLng = -49.2733;
+        
+        // City variable - this will be updated by the GeoIP API
+        let city = "Curitiba";
+        
+        // Define fixed profile locations (lat, lng) with status
+        const profiles = [
+            { id: 1, lat: -25.4260, lng: -49.2790, img: "/api/placeholder/50/50?text=1", status: "live" },
+            { id: 2, lat: -25.4220, lng: -49.2710, img: "/api/placeholder/50/50?text=2", status: "live" },
+            { id: 3, lat: -25.4290, lng: -49.2780, img: "/api/placeholder/50/50?text=3", status: "live" },
+            { id: 4, lat: -25.4280, lng: -49.2650, img: "/api/placeholder/50/50?text=4", status: "live" },
+            { id: 5, lat: -25.4350, lng: -49.2700, img: "/api/placeholder/50/50?text=5", status: "recent_30s" },
+            { id: 6, lat: -25.4230, lng: -49.2600, img: "/api/placeholder/50/50?text=6", status: "recent_2m" },
+            { id: 7, lat: -25.4180, lng: -49.2350, img: "/api/placeholder/50/50?text=7" },
+            { id: 8, lat: -25.4450, lng: -49.3050, img: "/api/placeholder/50/50?text=8" }
+        ];
+        
+        // Define fixed road labels
+        const roadLabels = [
+            { name: "PR-092", lat: -25.410, lng: -49.285 },
+            { name: "PR-417", lat: -25.410, lng: -49.245 },
+            { name: "PR-418", lat: -25.430, lng: -49.310 },
+            { name: "BR-277", lat: -25.450, lng: -49.300 },
+            { name: "BR-476", lat: -25.460, lng: -49.270 },
+            { name: "BR-116", lat: -25.460, lng: -49.250 }
+        ];
+
+        // Convert lat/lng to pixel coordinates
+        function latLngToPixel(lat, lng, zoom) {
+            const worldSize = tileSize * Math.pow(2, zoom);
+            const x = (lng + 180) / 360 * worldSize;
+            const latRad = lat * Math.PI / 180;
+            const mercN = Math.log(Math.tan((Math.PI / 4) + (latRad / 2)));
+            const y = (0.5 - mercN / (2 * Math.PI)) * worldSize;
+            return { x, y };
+        }
+        
+        // Convert tile coordinates to URL
+        function getTileUrl(x, y, zoom) {
+            return `https://b.tile.openstreetmap.org/${zoom}/${x}/${y}.png`;
+        }
+
+        // Calculate map boundaries and visible tiles
+        function calculateVisibleTiles() {
+            const mapWidth = map.offsetWidth;
+            const mapHeight = map.offsetHeight;
+            
+            const centerPixel = latLngToPixel(centerLat, centerLng, zoom);
+            const topLeftX = centerPixel.x - mapWidth / 2 - mapLeft;
+            const topLeftY = centerPixel.y - mapHeight / 2 - mapTop;
+            
+            const tileStartX = Math.floor(topLeftX / tileSize);
+            const tileStartY = Math.floor(topLeftY / tileSize);
+            const tilesX = Math.ceil(mapWidth / tileSize) + 2;
+            const tilesY = Math.ceil(mapHeight / tileSize) + 2;
+            
+            return {
+                tileStartX,
+                tileStartY,
+                tilesX,
+                tilesY,
+                centerPixel
+            };
+        }
+
+        // Render map tiles
+        function renderMap() {
+            // Clear current tiles
+            map.innerHTML = '';
+            
+            const { tileStartX, tileStartY, tilesX, tilesY, centerPixel } = calculateVisibleTiles();
+            
+            // Create tiles
+            for (let y = 0; y < tilesY; y++) {
+                for (let x = 0; x < tilesX; x++) {
+                    const tileX = tileStartX + x;
+                    const tileY = tileStartY + y;
+                    
+                    if (tileX < 0 || tileY < 0 || tileX >= Math.pow(2, zoom) || tileY >= Math.pow(2, zoom)) {
+                        continue; // Skip invalid tiles
+                    }
+                    
+                    const tileDiv = document.createElement('div');
+                    tileDiv.className = 'map-tile';
+                    tileDiv.style.left = ((tileX * tileSize) - (centerPixel.x - map.offsetWidth / 2) + mapLeft) + 'px';
+                    tileDiv.style.top = ((tileY * tileSize) - (centerPixel.y - map.offsetHeight / 2) + mapTop) + 'px';
+                    tileDiv.style.backgroundImage = `url(${getTileUrl(tileX, tileY, zoom)})`;
+                    map.appendChild(tileDiv);
+                }
+            }
+            
+            // Update profile markers and road labels
+            updateProfileMarkers();
+            updateRoadLabels();
+        }
+
+        // Update profile markers position based on lat/lng
+        function updateProfileMarkers() {
+            const markersContainer = document.getElementById('profile-markers');
+            markersContainer.innerHTML = '';
+            
+            const centerPixel = latLngToPixel(centerLat, centerLng, zoom);
+            
+            profiles.forEach(profile => {
+                const pixel = latLngToPixel(profile.lat, profile.lng, zoom);
+                
+                const markerX = pixel.x - centerPixel.x + map.offsetWidth / 2 + mapLeft;
+                const markerY = pixel.y - centerPixel.y + map.offsetHeight / 2 + mapTop;
+                
+                // Only add markers that are visible on screen (with some margin)
+                if (markerX > -100 && markerX < map.offsetWidth + 100 && 
+                    markerY > -100 && markerY < map.offsetHeight + 100) {
+                    
+                    const marker = document.createElement('div');
+                    marker.className = 'profile-marker';
+                    marker.style.left = markerX + 'px';
+                    marker.style.top = markerY + 'px';
+                    
+                    const inner = document.createElement('div');
+                    inner.className = 'profile-marker-inner';
+                    
+                    const img = document.createElement('img');
+                    img.src = profile.img;
+                    img.alt = `Profile ${profile.id}`;
+                    
+                    const pointer = document.createElement('div');
+                    pointer.className = 'profile-marker-pointer';
+                    
+                    // Add status label if profile has one
+                    if (profile.status) {
+                        const statusLabel = document.createElement('div');
+                        
+                        if (profile.status === 'live') {
+                            statusLabel.className = 'profile-status live';
+                            statusLabel.textContent = 'AO VIVO';
+                        } else if (profile.status === 'recent_30s') {
+                            statusLabel.className = 'profile-status recent';
+                            statusLabel.textContent = 'VISTO POR ÚLTIMO 30 SEGUNDOS ATRÁS';
+                        } else if (profile.status === 'recent_2m') {
+                            statusLabel.className = 'profile-status recent';
+                            statusLabel.textContent = 'VISTO POR ÚLTIMO 2 MINUTOS ATRÁS';
+                        }
+                        
+                        marker.appendChild(statusLabel);
+                    }
+                    
+                    inner.appendChild(img);
+                    marker.appendChild(inner);
+                    marker.appendChild(pointer);
+                    markersContainer.appendChild(marker);
+                }
+            });
+        }
+
+        // Update road labels position based on lat/lng
+        function updateRoadLabels() {
+            const labelsContainer = document.getElementById('road-labels');
+            labelsContainer.innerHTML = '';
+            
+            const centerPixel = latLngToPixel(centerLat, centerLng, zoom);
+            
+            roadLabels.forEach(label => {
+                const pixel = latLngToPixel(label.lat, label.lng, zoom);
+                
+                const labelX = pixel.x - centerPixel.x + map.offsetWidth / 2 + mapLeft;
+                const labelY = pixel.y - centerPixel.y + map.offsetHeight / 2 + mapTop;
+                
+                // Only add labels that are visible on screen (with some margin)
+                if (labelX > -100 && labelX < map.offsetWidth + 100 && 
+                    labelY > -100 && labelY < map.offsetHeight + 100) {
+                    
+                    const labelDiv = document.createElement('div');
+                    labelDiv.className = 'road-label';
+                    labelDiv.textContent = label.name;
+                    labelDiv.style.left = labelX + 'px';
+                    labelDiv.style.top = labelY + 'px';
+                    
+                    labelsContainer.appendChild(labelDiv);
+                }
+            });
+        }
+
+        // Initialize map drag functionality
+        function initMapDrag() {
+            map.addEventListener('mousedown', startDrag);
+            map.addEventListener('touchstart', startDrag);
+            
+            document.addEventListener('mousemove', drag);
+            document.addEventListener('touchmove', drag);
+            
+            document.addEventListener('mouseup', endDrag);
+            document.addEventListener('touchend', endDrag);
+        }
+
+        // Start drag
+        function startDrag(e) {
+            isDragging = true;
+            
+            if (e.type === 'touchstart') {
+                startX = e.touches[0].clientX;
+                startY = e.touches[0].clientY;
+            } else {
+                startX = e.clientX;
+                startY = e.clientY;
+            }
+            
+            startLeft = mapLeft;
+            startTop = mapTop;
+            
+            e.preventDefault();
+        }
+
+        // During drag
+        function drag(e) {
+            if (!isDragging) return;
+            
+            let currentX, currentY;
+            
+            if (e.type === 'touchmove') {
+                currentX = e.touches[0].clientX;
+                currentY = e.touches[0].clientY;
+            } else {
+                currentX = e.clientX;
+                currentY = e.clientY;
+            }
+            
+            let deltaX = currentX - startX;
+            let deltaY = currentY - startY;
+            
+            mapLeft = startLeft + deltaX;
+            mapTop = startTop + deltaY;
+            
+            // Update map and markers
+            renderMap();
+            
+            e.preventDefault();
+        }
+
+        // End drag
+        function endDrag() {
+            if (isDragging) {
+                isDragging = false;
+                
+                // Update center coordinates based on drag
+                const centerPixel = latLngToPixel(centerLat, centerLng, zoom);
+                const newCenterPixelX = centerPixel.x - mapLeft;
+                const newCenterPixelY = centerPixel.y - mapTop;
+                
+                // Calculate world size at current zoom
+                const worldSize = tileSize * Math.pow(2, zoom);
+                
+                // Convert pixel to lat/lng
+                const lng = (newCenterPixelX / worldSize) * 360 - 180;
+                const mercN = 0.5 - (newCenterPixelY / worldSize);
+                const lat = (2 * Math.atan(Math.exp(mercN * 2 * Math.PI)) - Math.PI / 2) * 180 / Math.PI;
+                
+                centerLat = lat;
+                centerLng = lng;
+                
+                // Reset map position
+                mapLeft = 0;
+                mapTop = 0;
+                
+                // Render the map with new center
+                renderMap();
+            }
+        }
+
+        // Handle zoom in button
+        document.getElementById('zoom-in').addEventListener('click', function() {
+            if (zoom < 19) {
+                zoom++;
+                renderMap();
+            }
+        });
+        
+        // Handle zoom out button
+        document.getElementById('zoom-out').addEventListener('click', function() {
+            if (zoom > 1) {
+                zoom--;
+                renderMap();
+            }
+        });
+        
+        // Handle button click - redirect to Google
+        document.getElementById('man-button').addEventListener('click', function() {
+            window.open('https://www.google.com', '_blank');
+        });
+        
+        // Get user's city from GeoIP API
+        async function getUserCity() {
+            try {
+                // In a real app, you would use a GeoIP API here
+                // For example: const response = await fetch('https://api.ipgeolocation.io/ipgeo?apiKey=YOUR_API_KEY');
+                
+                // Simulating API delay
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                // Simulated API response
+                return {
+                    city: city,
+                    country: "Brasil"
+                };
+            } catch (error) {
+                console.error("Error fetching location:", error);
+                return {
+                    city: "Desconhecida",
+                    country: "Brasil"
+                };
+            }
+        }
+        
+        // Update headline with city name
+        function updateHeadline(cityData) {
+            const headline = document.getElementById('main-headline');
+            headline.textContent = `É hora de dar o "match" na sua história de amor em ${cityData.city}!`;
+        }
+        
+        // Start everything
+        window.onload = async function() {
+            // Initialize map drag functionality
+            initMapDrag();
+            
+            // Render initial map
+            renderMap();
+            
+            // Get user city from GeoIP API
+            const cityData = await getUserCity();
+            
+            // Update location text and headline
+            document.getElementById('location-text').textContent = `${cityData.city}, ${cityData.country}`;
+            updateHeadline(cityData);
+            
+            // Handle window resize
+            window.addEventListener('resize', renderMap);
+        };
+    </script>
+</body>
+</html>
