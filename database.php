@@ -1,8 +1,8 @@
 <?php
 $host = 'localhost';
-$db = 'u413151551_livemodelo';
-$user = 'u413151551_livemodelo';
-$pass = 'dA!0$jru=E';
+$db = 'live';
+$user = 'root';
+$pass = 'fatordominante777@jJ';
 $charset = 'utf8mb4';
 
 $dsn = "mysql:host=$host;dbname=$db;charset=$charset";
